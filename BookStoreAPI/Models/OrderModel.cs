@@ -6,7 +6,7 @@ namespace BookStoreAPI.Models
     public class OrderModel
     {
         [Required]
-        public Guid Id { get; private set; } = Guid.NewGuid();
+        public Guid Id { get; init; } = Guid.NewGuid();
 
         [Required(ErrorMessage = "Order date is required")]
         [Display(Name = "Order Date")]
