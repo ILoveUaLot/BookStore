@@ -1,4 +1,6 @@
-﻿namespace BookStoreAPI.Middlewares
+﻿using Newtonsoft.Json;
+
+namespace BookStoreAPI.Middlewares
 {
     public class ExceptionHandlingMiddleware
     {
@@ -16,14 +18,27 @@
             {
                 await _next(httpContext);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                _logger.LogError(ex, "An unhadled exception occured");
+                _logger.LogError(ex, "An unhandled exception occurred");
 
-                httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                httpContext.Response.ContentType = "application/json";
-                await httpContext.Response.WriteAsync("An error occurred while processing the request.");
+                await HandleExceptionAsync(httpContext, ex);
             }
+        }
+
+        private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            context.Response.ContentType = "application/json";
+
+            // Logging the exception
+            _logger.LogError(exception, "An unhandled exception occurred");
+
+            // Send JSON response
+            var errorResponse = new ErrorResponse { Errors = new List<string> { "An error occurred while processing the request." } };
+            var jsonResponse = JsonConvert.SerializeObject(errorResponse);
+
+            await context.Response.WriteAsync(jsonResponse);
         }
     }
 

@@ -10,32 +10,49 @@ namespace BookStoreAPI.Middlewares
     public class OrderValidationMiddleware
     {
         private readonly RequestDelegate _next;
-
-        public OrderValidationMiddleware(RequestDelegate next)
+        ILogger<OrderValidationMiddleware> _logger;
+        public OrderValidationMiddleware(RequestDelegate next, ILogger<OrderValidationMiddleware> logger)
         {
+            _logger = logger;
             _next = next;
         }
 
         public async Task Invoke(HttpContext httpContext)
         {
-            string requestBody = await new StreamReader(httpContext.Request.Body).ReadToEndAsync();
-
-            OrderModel order = JsonConvert.DeserializeObject<OrderModel>(requestBody);
-
-            List<ValidationResult> validationResults = new List<ValidationResult>();
-
-            bool isValid = Validator.TryValidateObject(order, new ValidationContext(order), validationResults, true);
-
-            if (!isValid)
+            if (httpContext.Request.Path.StartsWithSegments("/api/order", StringComparison.OrdinalIgnoreCase) &&
+                httpContext.Request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
             {
-                var errors = validationResults.Select(vr => vr.ErrorMessage);
-                httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-                httpContext.Response.ContentType = "application/json";
-                await httpContext.Response.WriteAsync(JsonConvert.SerializeObject(new {Errors = errors}));
-                return;
+                using (var reader = new StreamReader(httpContext.Request.Body))
+                {
+                    var requestBody = await reader.ReadToEndAsync();
+
+                    var order = JsonConvert.DeserializeObject<OrderModel>(requestBody);
+
+                    var validationContext = new ValidationContext(order);
+                    var validationResults = new List<ValidationResult>();
+
+                    if (!Validator.TryValidateObject(order, validationContext, validationResults, true))
+                    {
+                        var errors = validationResults.Select(result => result.ErrorMessage).ToList();
+                        var errorResponse = new ErrorResponse { Errors = errors };
+                        var jsonResponse = JsonConvert.SerializeObject(errorResponse);
+
+                        httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                        httpContext.Response.ContentType = "application/json";
+                        await httpContext.Response.WriteAsync(jsonResponse);
+                        return;
+                    }
+
+                }
+                await _next.Invoke(httpContext);
             }
-            await _next(httpContext);
         }
+    }
+
+
+    public class ErrorResponse
+    {
+        public List<string> Errors { get; set; }
     }
 
     public static class OrderValidationMiddlewareExtensions
