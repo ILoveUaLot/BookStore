@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace BookStoreAPI.Middlewares
 {
+    /// <summary>
+    /// Middleware for validate orderModel
+    /// </summary>
     public class OrderValidationMiddleware
     {
         private readonly RequestDelegate _next;
@@ -48,7 +51,6 @@ namespace BookStoreAPI.Middlewares
             }
         }
     }
-
 
     public class ErrorResponse
     {

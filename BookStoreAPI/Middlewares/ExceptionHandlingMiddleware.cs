@@ -2,10 +2,15 @@
 
 namespace BookStoreAPI.Middlewares
 {
+    /// <summary>
+    /// Middleware for handling exceptions during HTTP request processing.
+    /// </summary>
     public class ExceptionHandlingMiddleware
     {
         private readonly RequestDelegate _next;
         ILogger<ExceptionHandlingMiddleware> _logger;
+        /// <param name="next">The next component in the request processing pipeline.</param>
+        /// <param name="logger">The logger interface for recording exception information.</param>
         public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
         {
             _next = next;
