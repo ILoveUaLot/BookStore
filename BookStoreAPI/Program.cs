@@ -16,7 +16,7 @@ namespace BookStoreAPI
 
             // Add services to the container.
             builder.Services.AddControllers();
-
+            builder.Services.AddLogging();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             
@@ -48,9 +48,9 @@ namespace BookStoreAPI
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
-            app.UseExceptionHandlingMiddleware();
             app.UseOrderValidationMiddleware();
+            app.UseExceptionHandlingMiddleware();
+            
             app.MapControllers();
 
             app.Run();
