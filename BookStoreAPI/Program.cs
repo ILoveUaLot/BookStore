@@ -3,6 +3,7 @@ using AutoMapper;
 using BookStoreAPI.Data;
 using BookStoreAPI.Data.Repository;
 using BookStoreAPI.Data.Repository.Interfaces;
+using BookStoreAPI.Middlewares;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreAPI
@@ -14,8 +15,8 @@ namespace BookStoreAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
+            
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -49,7 +50,7 @@ namespace BookStoreAPI
 
             app.UseAuthorization();
 
-
+            app.UseExceptionHandlingMiddleware();
             app.MapControllers();
 
             app.Run();
