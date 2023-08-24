@@ -65,7 +65,30 @@ namespace BookStoreApiTests
             // Assert
             Assert.IsInstanceOf<NotFoundResult>(result);
         }
+        [Test]
+        public async Task GetBookByFilter_ExistingData_ReturnsOk()
+        {
+            // Arrange
+            var title = "Test Book";
+            var releaseDate = DateTime.Now;
+            var mockBooks = new List<Book>
+            {
+                new Book { Id = Guid.NewGuid(), Title = title, ReleaseDate = releaseDate }
+                // Add more mock data if needed
+            };
+            _mockBookRepo.Setup(repo => repo.GetBooksByFilterAsync(title, releaseDate)).ReturnsAsync(mockBooks);
 
-        
+            // Act
+            var result = await _controller.GetBookByFilter(title, releaseDate);
+
+            // Assert
+            Assert.IsInstanceOf<OkObjectResult>(result);
+            var okResult = result as OkObjectResult;
+            Assert.NotNull(okResult?.Value);
+            Assert.IsInstanceOf<List<BookModel>>(okResult.Value);
+        }
+
+       
+
     }
 }
