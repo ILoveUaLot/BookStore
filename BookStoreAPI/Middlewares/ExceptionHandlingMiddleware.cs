@@ -39,14 +39,24 @@ namespace BookStoreAPI.Middlewares
             // Logging the exception
             _logger.LogError(exception, "An unhandled exception occurred");
 
-            // Send JSON response
-            var errorResponse = new ErrorResponse { Errors = new List<string> { "An error occurred while processing the request." } };
+            var errorResponse = new ErrorResponse
+            {
+                Errors = new List<string>
+                {
+                    "An error occurred while processing the request.",
+                    exception.Message // Include the exception message
+                }
+            };
+
             var jsonResponse = JsonConvert.SerializeObject(errorResponse);
 
             await context.Response.WriteAsync(jsonResponse);
         }
     }
-
+    public class ErrorResponse
+    {
+        public List<string> Errors { get; set; }
+    }
     public static class ExceptionHandlingMiddlewareExtensions
     {
         public static IApplicationBuilder UseExceptionHandlingMiddleware(this IApplicationBuilder builder)
