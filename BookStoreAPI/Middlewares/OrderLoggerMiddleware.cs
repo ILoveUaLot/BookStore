@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace BookStoreAPI.Middlewares
 {
+    /// <summary>
+    /// Middleware for logging orders made
+    /// </summary>
     public class OrderLoggerMiddleware
     {
         private readonly RequestDelegate _next;

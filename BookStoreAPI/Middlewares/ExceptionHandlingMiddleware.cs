@@ -53,6 +53,9 @@ namespace BookStoreAPI.Middlewares
             await context.Response.WriteAsync(jsonResponse);
         }
     }
+    /// <summary>
+    /// Use for collecting errors
+    /// </summary>
     public class ErrorResponse
     {
         public List<string> Errors { get; set; }
