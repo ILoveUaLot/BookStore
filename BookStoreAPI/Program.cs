@@ -48,9 +48,8 @@ namespace BookStoreAPI
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-            app.UseOrderValidationMiddleware();
             app.UseExceptionHandlingMiddleware();
-            
+            app.UseOrderLoggerMiddleware();
             app.MapControllers();
 
             app.Run();

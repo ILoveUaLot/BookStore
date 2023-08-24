@@ -22,7 +22,7 @@ namespace BookStoreAPI.Controllers
             _logger = logger;
         }
 
-        [HttpGet("{id}&{orderDate}")]
+        [HttpGet("{id}/{orderDate}")]
         public async Task<IActionResult> GetOrderByFilter(Guid id, DateTime? orderDate)
         {
             List<Order> orderEntities = await _orderRepo.GetOrdersByFilter(id, orderDate);
