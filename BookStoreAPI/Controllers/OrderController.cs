@@ -20,12 +20,24 @@ namespace BookStoreAPI.Controllers
         }
 
         [HttpGet("{id}&{orderDate}")]
-        public async Task<List<OrderModel>> GetOrderByFilter(Guid id, DateTime? orderDate)
+        public async Task<IActionResult> GetOrderByFilter(Guid id, DateTime? orderDate)
         {
             List<Order> orderEntities = await _orderRepo.GetOrdersByFilter(id, orderDate);
             if (orderEntities == null) NotFound();
             List<OrderModel> orderList = _mapper.Map<List<OrderModel>>(orderEntities);
-            return orderList;
+            return Ok(orderList);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddOrder(OrderModel orderModel)
+        {
+            Order order = _mapper.Map<Order>(orderModel);
+            if(ModelState.IsValid)
+            {
+                await _orderRepo.CreateAsync(order);
+                return CreatedAtAction(nameof(AddOrder), new {id = order.id});
+            }
+            return BadRequest();
         }
     }
 }
