@@ -10,7 +10,7 @@ namespace BookStoreAPI.Data
 
         }
 
-        DbSet<Book> Books { get; set; }
-        DbSet<Order> Orders { get; set; }
+        public DbSet<Book> Books { get; set; }
+        public DbSet<Order> Orders { get; set; }
     }
 }
