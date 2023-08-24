@@ -52,6 +52,20 @@ namespace BookStoreApiTests
             Assert.IsInstanceOf<BookModel>(okResult.Value);
         }
 
+        [Test]
+        public async Task GetBook_NonExistentId_ReturnsNotFound()
+        {
+            // Arrange
+            var nonExistentId = Guid.NewGuid();
+            _mockBookRepo.Setup(repo => repo.GetByIdAsync(nonExistentId)).ReturnsAsync((Book)null);
+
+            // Act
+            var result = await _controller.GetBook(nonExistentId);
+
+            // Assert
+            Assert.IsInstanceOf<NotFoundResult>(result);
+        }
+
         
     }
 }
