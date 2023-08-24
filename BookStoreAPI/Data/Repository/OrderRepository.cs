@@ -33,6 +33,19 @@ namespace BookStoreAPI.Data.Repository
            return await db.Orders.FindAsync(id);
         }
 
+        public Task<List<Order>> GetOrdersByFilter(Guid id, DateTime orderDate)
+        {
+            IQueryable<Order> orders = db.Orders;
+            if(id != default)
+            {
+                orders = orders.Where(o => o.id == id);
+            }
+            if(orderDate != default)
+            {
+                orders = orders.Where(o => o.OrderDate >= orderDate);
+            }
+        }
+
         public async Task UpdateAsync(Order entity)
         {
             db.Orders.Update(entity);
