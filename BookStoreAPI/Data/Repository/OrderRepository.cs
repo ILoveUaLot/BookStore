@@ -1,5 +1,6 @@
 ﻿using BookStoreAPI.Data.Entities;
 using BookStoreAPI.Data.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreAPI.Data.Repository
 {
@@ -33,17 +34,18 @@ namespace BookStoreAPI.Data.Repository
            return await db.Orders.FindAsync(id);
         }
 
-        public Task<List<Order>> GetOrdersByFilter(Guid id, DateTime orderDate)
+        public async Task<List<Order>> GetOrdersByFilter(Guid id, DateTime? orderDate)
         {
-            IQueryable<Order> orders = db.Orders;
-            if(id != default)
+            IQueryable<Order> orders = db.Orders.Include(o=>o.Books);
+            if(id != Guid.Empty)
             {
                 orders = orders.Where(o => o.id == id);
             }
-            if(orderDate != default)
+            if(orderDate != null)
             {
                 orders = orders.Where(o => o.OrderDate >= orderDate);
             }
+            return await orders.ToListAsync();
         }
 
         public async Task UpdateAsync(Order entity)
