@@ -28,6 +28,21 @@ namespace BookStoreAPI.Data.Repository
             return db.Books;
         }
 
+        public async Task<List<Book>> GetBooksByFilterAsync(string title, DateTime releaseDate)
+        {
+            IQueryable<Book> booksQuery = db.Books;
+            if(!string.IsNullOrEmpty(title))
+            {
+                booksQuery = booksQuery.Where(book=>book.Title.Contains(title));
+            }
+                
+            if(releaseDate != default)
+            {
+                booksQuery = booksQuery.Where(book=>book.ReleaseDate.Date == releaseDate);
+            }
+            return await booksQuery.ToListAsync();
+        }
+
         public async Task<Book> GetByIdAsync(Guid id)
         {
             return await db.Books.FindAsync(id);
