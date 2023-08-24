@@ -2,7 +2,7 @@
 {
     public class BookModel
     {
-        public Guid id { get; init; }
+        public readonly Guid id;
         public string Author { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
