@@ -14,8 +14,8 @@ namespace BookStoreAPI.Controllers
     {
         IMapper _mapper;
         IOrderRepository _orderRepo;
-        ILogger _logger;
-        public OrderController(IMapper mapper, IOrderRepository orderRepository, ILogger logger)
+        ILogger<OrderController> _logger;
+        public OrderController(IMapper mapper, IOrderRepository orderRepository, ILogger<OrderController> logger)
         {
             _mapper = mapper;
             _orderRepo = orderRepository;
