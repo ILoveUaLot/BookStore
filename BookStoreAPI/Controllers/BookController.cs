@@ -28,7 +28,7 @@ namespace BookStoreAPI.Controllers
             return Ok(bookModel);
         }
 
-        [HttpGet("{title}&{releaseDate}")]
+        [HttpGet("{title}/{releaseDate}")]
         public async Task<IActionResult> GetBookByFilter(string title, DateTime releaseDate)
         {
             List<Book> booksEntities = await _bookRepo.GetBooksByFilterAsync(title, releaseDate);
