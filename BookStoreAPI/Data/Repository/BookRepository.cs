@@ -28,7 +28,7 @@ namespace BookStoreAPI.Data.Repository
             return db.Books;
         }
 
-        public async Task<List<Book>> GetBooksByFilterAsync(string title, DateTime releaseDate)
+        public async Task<List<Book>> GetBooksByFilterAsync(string title, DateTime? releaseDate)
         {
             IQueryable<Book> booksQuery = db.Books;
             if(!string.IsNullOrEmpty(title))
@@ -36,7 +36,7 @@ namespace BookStoreAPI.Data.Repository
                 booksQuery = booksQuery.Where(book=>book.Title.Contains(title));
             }
                 
-            if(releaseDate != default)
+            if(releaseDate != null)
             {
                 booksQuery = booksQuery.Where(book=>book.ReleaseDate.Date >= releaseDate);
             }
