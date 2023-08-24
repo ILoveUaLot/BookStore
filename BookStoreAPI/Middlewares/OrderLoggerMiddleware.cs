@@ -1,13 +1,14 @@
-﻿using BookStoreAPI.Models;
+﻿using Azure.Core;
+using BookStoreAPI.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace BookStoreAPI.Middlewares
 {
-    // You may need to install the Microsoft.AspNetCore.Http.Abstractions package into your project
     public class OrderLoggerMiddleware
     {
         private readonly RequestDelegate _next;
@@ -23,22 +24,17 @@ namespace BookStoreAPI.Middlewares
             if (httpContext.Request.Path.StartsWithSegments("/api/order", StringComparison.OrdinalIgnoreCase) &&
                 httpContext.Request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
             {
-                using (var reader = new StreamReader(httpContext.Request.Body))
+                var requestBody = await new StreamReader(httpContext.Request.Body).ReadToEndAsync();
+                var order = JsonConvert.DeserializeObject<OrderModel>(requestBody);
+
+                _logger.LogInformation($"Made order: {order.Id}; " +
+                    $"Order accepted for processing {order.OrderDate}");
+                foreach (var item in order.Books)
                 {
-                    var requestBody = await reader.ReadToEndAsync();
-
-                    var order = JsonConvert.DeserializeObject<OrderModel>(requestBody);
-
-                    _logger.LogInformation($"Maked order: {order.Id}; " +
-                        $"Order accepted for processing {order.OrderDate}");
-                    foreach (var item in order.Books)
-                    {
-                        _logger.LogInformation($"{item.Title} was ordered; it is id {item.Id}");
-                    }
-
-                    await _next(httpContext);
+                    _logger.LogInformation($"{item.Title} was ordered; it is id {item.Id}");
                 }
             }
+            await _next.Invoke(httpContext);
         }
     }
 
