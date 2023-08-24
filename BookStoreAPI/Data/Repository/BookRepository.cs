@@ -38,7 +38,7 @@ namespace BookStoreAPI.Data.Repository
                 
             if(releaseDate != default)
             {
-                booksQuery = booksQuery.Where(book=>book.ReleaseDate.Date == releaseDate);
+                booksQuery = booksQuery.Where(book=>book.ReleaseDate.Date >= releaseDate);
             }
             return await booksQuery.ToListAsync();
         }
