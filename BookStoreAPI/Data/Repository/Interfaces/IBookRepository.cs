@@ -1,4 +1,4 @@
-﻿using BookStoreAPI.Models;
+﻿using BookStoreAPI.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreAPI.Data.Repository.Interfaces

@@ -1,4 +1,4 @@
-﻿using BookStoreAPI.Models;
+﻿using BookStoreAPI.Data.Entities;
 
 namespace BookStoreAPI.Data.Repository.Interfaces
 {

@@ -1,5 +1,5 @@
-﻿using BookStoreAPI.Data.Repository.Interfaces;
-using BookStoreAPI.Models;
+﻿using BookStoreAPI.Data.Entities;
+using BookStoreAPI.Data.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreAPI.Data.Repository
