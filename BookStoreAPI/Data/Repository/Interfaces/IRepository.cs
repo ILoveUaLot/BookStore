@@ -6,6 +6,6 @@
         Task UpdateAsync();
         Task DeleteAsync(T entity);
         Task<T> GetByIdAsync(Guid id);
-        Task<IQueryable<T>> GetAllAsync();
+        IQueryable<T> GetAll();
     }
 }
