@@ -36,20 +36,25 @@ namespace BookStoreAPI.Controllers
         {
             try
             {
-                Order order = _mapper.Map<Order>(orderModel);
-
-                if (ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
-                    await _orderRepo.CreateAsync(order);
-                    return CreatedAtAction(nameof(AddOrder), new { id = order.id });
+                    var errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToList();
+
+                    _logger.LogError($"Model state is invalid. Errors: {string.Join(", ", errors)}");
+                    return BadRequest(errors);
                 }
 
-                return BadRequest();
+                Order order = _mapper.Map<Order>(orderModel);
+                await _orderRepo.CreateAsync(order);
+
+                return CreatedAtAction(nameof(AddOrder), new { id = order.id });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while creating an order.");
-
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing the request.");
             }
         }
