@@ -5,7 +5,7 @@ namespace BookStoreAPI.Models
     public class BookModel
     {
         [Required]
-        public Guid Id { get; init; } = Guid.NewGuid();
+        public Guid Id { get; init; }
 
         [Required(ErrorMessage = "Author is required")]
         public string Author { get; set; }

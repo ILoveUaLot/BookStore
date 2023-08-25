@@ -25,8 +25,6 @@ namespace BookStoreAPI.Middlewares
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unhandled exception occurred");
-
                 await HandleExceptionAsync(httpContext, ex);
             }
         }

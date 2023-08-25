@@ -27,21 +27,48 @@ namespace BookStoreAPI.Middlewares
         {
             // Check if the incoming request is a POST request to the "/api/order" endpoint
             if (httpContext.Request.Path.StartsWithSegments("/api/order", StringComparison.OrdinalIgnoreCase) &&
-                httpContext.Request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
+               httpContext.Request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
             {
-                // Read the request body, expecting JSON content
-                var requestBody = await new StreamReader(httpContext.Request.Body).ReadToEndAsync();
-                var order = JsonConvert.DeserializeObject<OrderModel>(requestBody);
+                // Backup the original stream
+                var originalBodyStream = httpContext.Request.Body;
 
-                // Log information about the order and the ordered books
-                _logger.LogInformation($"Made order: {order.Id}; " +
-                    $"Order accepted for processing {order.OrderDate}");
-                foreach (var item in order.Books)
+                try
                 {
-                    _logger.LogInformation($"{item.Title} was ordered; it is id {item.Id}");
+                    using (var requestBodyStream = new MemoryStream())
+                    {
+                        await httpContext.Request.Body.CopyToAsync(requestBodyStream);
+                        requestBodyStream.Seek(0, SeekOrigin.Begin);
+
+                        var requestBody = new StreamReader(requestBodyStream).ReadToEnd();
+                        requestBodyStream.Seek(0, SeekOrigin.Begin);
+
+                        // Replace the original stream
+                        httpContext.Request.Body = requestBodyStream;
+
+                        var order = JsonConvert.DeserializeObject<OrderModel>(requestBody);
+
+                        _logger.LogInformation($"Made order: {order.Id}; " +
+                            $"Order accepted for processing {order.OrderDate}");
+                        foreach (var item in order.Books)
+                        {
+                            _logger.LogInformation($"{item.Title} was ordered; it is id {item.Id}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error reading request body");
+                }
+                finally
+                {
+                    // Restore the original stream
+                    httpContext.Request.Body = originalBodyStream;
                 }
             }
-        }
+
+            // Call the next middleware in the pipeline
+            await _next(httpContext);
+        }    
     }
 
     public static class OrderLoggerMiddlewareExtensions
