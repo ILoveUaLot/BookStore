@@ -16,59 +16,35 @@ namespace BookStoreAPI.Middlewares
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<OrderLoggerMiddleware> _logger;
+
         public OrderLoggerMiddleware(RequestDelegate next, ILogger<OrderLoggerMiddleware> logger)
         {
             _next = next;
             _logger = logger;
         }
 
-        // The InvokeAsync method is responsible for handling the incoming HTTP request
         public async Task InvokeAsync(HttpContext httpContext)
         {
-            // Check if the incoming request is a POST request to the "/api/order" endpoint
-            if (httpContext.Request.Path.StartsWithSegments("/api/order", StringComparison.OrdinalIgnoreCase) &&
-               httpContext.Request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
+            if (httpContext.Request.Path.StartsWithSegments("/api/order") &&
+                httpContext.Request.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
             {
-                // Backup the original stream
-                var originalBodyStream = httpContext.Request.Body;
+                httpContext.Request.EnableBuffering();
 
-                try
+                var requestBody = await new StreamReader(httpContext.Request.Body, Encoding.UTF8, true, 1024, leaveOpen: true).ReadToEndAsync();
+                httpContext.Request.Body.Position = 0;
+
+                if (!string.IsNullOrWhiteSpace(requestBody))
                 {
-                    using (var requestBodyStream = new MemoryStream())
+                    var order = JsonConvert.DeserializeObject<OrderModel>(requestBody);
+                    if (order != null)
                     {
-                        await httpContext.Request.Body.CopyToAsync(requestBodyStream);
-                        requestBodyStream.Seek(0, SeekOrigin.Begin);
-
-                        var requestBody = new StreamReader(requestBodyStream).ReadToEnd();
-                        requestBodyStream.Seek(0, SeekOrigin.Begin);
-
-                        // Replace the original stream
-                        httpContext.Request.Body = requestBodyStream;
-
-                        var order = JsonConvert.DeserializeObject<OrderModel>(requestBody);
-
-                        _logger.LogInformation($"Made order: {order.Id}; " +
-                            $"Order accepted for processing {order.OrderDate}");
-                        foreach (var item in order.Books)
-                        {
-                            _logger.LogInformation($"{item.Title} was ordered; it is id {item.Id}");
-                        }
+                        _logger.LogInformation($"Made order: {order.Id}; Order accepted for processing {order.OrderDate}");
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error reading request body");
-                }
-                finally
-                {
-                    // Restore the original stream
-                    httpContext.Request.Body = originalBodyStream;
                 }
             }
 
-            // Call the next middleware in the pipeline
             await _next(httpContext);
-        }    
+        }
     }
 
     public static class OrderLoggerMiddlewareExtensions
