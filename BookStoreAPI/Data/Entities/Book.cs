@@ -7,6 +7,8 @@
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime ReleaseDate { get; set; }
+        public Guid OrderId { get; set; }
+        public virtual Order Order { get; set; }
 
     }
 }
